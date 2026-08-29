@@ -1,0 +1,7 @@
+.env
+__pycache__/
+*.pyc
+.streamlit/secrets.toml
+feedback.csv
+usage_log.csv
+.dart_corp_codes.xml
