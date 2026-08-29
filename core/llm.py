@@ -100,8 +100,14 @@ def extract(task_label: str, target: str, search_results: list[dict], industry: 
         config=types.GenerateContentConfig(
             system_instruction=SYSTEM_PROMPT,
             response_mime_type="application/json",
-            thinking_config=types.ThinkingConfig(thinking_budget=0),
-            max_output_tokens=6000,
+            # thinking_budget=0 (fully disabled) is rejected by this model with a bare
+            # 400 INVALID_ARGUMENT; -1 (dynamic, model decides) is the closest allowed
+            # approximation of the original's "disable extended thinking" choice.
+            thinking_config=types.ThinkingConfig(thinking_budget=-1),
+            # Higher than the Claude version's 6000: thinking tokens (unavoidable at
+            # budget=-1, since 0 is rejected by this model) share the same output
+            # budget as the JSON response, and 6000 was cutting the JSON off mid-way.
+            max_output_tokens=16000,
         ),
     )
     raw = (response.text or "").strip()
